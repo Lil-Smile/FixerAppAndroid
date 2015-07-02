@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FixerAppAndroid</string>
+    <string name="loginValue">Login</string>
+    <string name="passwordValue">Password</string>
+    <string name="loginButton">Далее</string>
+    <string name="exerciseTitle">Упражнение</string>
+    <string name="column1Text">Подход</string>
+    <string name="column2Text">Очки</string>
+    <string name="column3Text">Время</string>
+    <string name="plusButton">+</string>
+    <string name="startButton">Старт</string>
+    <string name="minutes">Минут</string>
+    <string name="seconds">Секунды</string>
+    <string name="okButton">ОК</string>
+</resources>
