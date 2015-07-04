@@ -43,9 +43,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
         sharedPreferences = getPreferences(MODE_PRIVATE);
 
-        //todo : add precheck
-
-        //precheck (lol it doesn't work)
 
         if (!sharedPreferences.getString(FIXER_LOGIN,"").equals(""))
         {

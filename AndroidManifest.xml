@@ -13,5 +13,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".TableActivity"/>
+        <activity android:name=".StatActivity"/>
     </application>
 </manifest>

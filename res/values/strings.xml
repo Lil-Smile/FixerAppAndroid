@@ -13,4 +13,11 @@
     <string name="minutes">Минут</string>
     <string name="seconds">Секунды</string>
     <string name="okButton">ОК</string>
+    <string name="cancel">Отмена</string>
+    <string name="mainDate">Дата</string>
+    <string name="mainTime">Время</string>
+    <string name="mainExercise">Упражнение</string>
+    <string name="mainCount">Очки</string>
+    <string name="statButton">Статистика</string>
+    <string name="pushToSite">Отправить на сайт</string>
 </resources>

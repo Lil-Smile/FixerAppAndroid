@@ -1,7 +1,16 @@
 package com.example.FixerAppAndroid;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import com.example.FixerAppAndroid.R;
@@ -15,10 +24,16 @@ import java.util.List;
 public class TableActivity extends Activity implements View.OnClickListener {
 
 
+    final String TAG = "LOGGED";
+    final String TABLE_NAME="FIXER_TABLE";
+    final int DIALOG = 1;
     final String[] exercisesString = {"Рывок","Толчок","Д.цикл"};
     Integer[] timeInt = new Integer[60];
     int minutesInt = 0;
     int secondsInt = 0;
+
+    List<DataForDB> dataForDBs = new ArrayList<DataForDB>(10);
+    List<Integer> timeList = new ArrayList<Integer>(10);
 
 
 
@@ -32,9 +47,10 @@ public class TableActivity extends Activity implements View.OnClickListener {
     TextView textView;
     TextView textView1;
     Button button;
-    Button timePickerButton;
     Button startButton;
-    int timeButtonsId = R.id.timeButton1;
+    Button statButton;
+
+    Dialog dialog;
 
     Button plusButton;
 
@@ -42,18 +58,20 @@ public class TableActivity extends Activity implements View.OnClickListener {
 
     int currentExercise = 0; //счетчик упражнений
 
-    RelativeLayout timePickerLayout;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.table_activity);
 
-        timePickerLayout = (RelativeLayout)findViewById(R.id.layoutWithTimePicker);
-        timePickerButton = (Button)findViewById(R.id.timePickerButton);
-        timePickerButton.setOnClickListener(this);
+
+
         startButton = (Button)findViewById(R.id.startButton);
         startButton.setOnClickListener(this);
+
+        statButton = (Button)findViewById(R.id.statButton);
+        statButton.setOnClickListener(this);
 
         tl = (TableLayout)findViewById(R.id.currentStatLayout);
         tableRow = (TableRow)findViewById(R.id.createdTableRow);
@@ -114,6 +132,9 @@ public class TableActivity extends Activity implements View.OnClickListener {
                 tButton.setText("00:00");
                 timeListButton.get(currentExercise).setEnabled(false); //black fucking magic
                 timeListButton.get(currentExercise).setId(0);
+                //adding previous to array
+                DataForDB dataForDB = new DataForDB(timeList.get(currentExercise).intValue(),Integer.valueOf(pointListTextView.get(currentExercise).getText().toString()).intValue(),exerciseListTextView.get(currentExercise).getText().toString());
+                dataForDBs.add(dataForDB);
                 currentExercise++;
                 exerciseListTextView.add(currentExercise,exTextView);
                 pointListTextView.add(currentExercise,poTextView);
@@ -124,56 +145,19 @@ public class TableActivity extends Activity implements View.OnClickListener {
                 tr.addView(tButton);
                 tr.setLayoutParams(tableRow.getLayoutParams());
                 tl.addView(tr);
+
+
                 break;
             }
             case R.id.timeButton1:
             {
+                showDialog(DIALOG);
 
-                //RelativeLayout rl = (RelativeLayout)findViewById(R.id.tableMainLayout);
-                //rl.setVisibility(View.INVISIBLE);
-                final ArrayAdapter<Integer> minutes = new ArrayAdapter<Integer>(this,android.R.layout.simple_spinner_item,timeInt);
-                minutes.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                Spinner spM = (Spinner)findViewById(R.id.spinnerMinutes);
-                Spinner spS = (Spinner)findViewById(R.id.spinnerSeconds);
-                spM.setPrompt("Минуты");
-                spS.setPrompt("Секунды");
-                spM.setAdapter(minutes);
-                spS.setAdapter(minutes);
-                spM.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        minutesInt=position;
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
-                spS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        secondsInt=position;
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        secondsInt=0;
-                    }
-                });
-                timePickerLayout.setVisibility(View.VISIBLE);
 
                 break;
             }
-            case R.id.timePickerButton:
-            {
 
-                //RelativeLayout rl = (RelativeLayout)findViewById(R.id.tableMainLayout);
-                //rl.setVisibility(View.VISIBLE);
-                timePickerLayout.setVisibility(View.INVISIBLE);
-                timeListButton.get(currentExercise).setText(minutesInt+":"+secondsInt);
-                break;
-            }
+
             case R.id.startButton:
             {
                 long time = minutesInt*60+secondsInt;
@@ -181,6 +165,37 @@ public class TableActivity extends Activity implements View.OnClickListener {
                 //run(time);
                 break;
             }
+
+            case R.id.statButton:
+            {
+                Log.d(TAG,"start stat");
+                Intent intent = new Intent(TableActivity.this, StatActivity.class);
+                DBHelper dbHelper = new DBHelper(this,"FIXER_DB",null,1); //database
+                SQLiteDatabase database = dbHelper.getWritableDatabase();
+                for (int i = 0; i<dataForDBs.size(); i++) //adding to DATABASE
+                {
+                    database.beginTransaction();
+                    try {
+                        ContentValues cv = new ContentValues();
+                        cv.put("time", dataForDBs.get(i).getTime());
+                        cv.put("date", dataForDBs.get(i).getDate());
+                        cv.put("points", dataForDBs.get(i).getCount());
+                        cv.put("exercise", dataForDBs.get(i).getExercise());
+                        long tmp = database.insert(TABLE_NAME, null, cv);
+                        Log.d(TAG, Integer.valueOf((int) tmp).toString());
+                        database.setTransactionSuccessful();
+                    } finally {
+                        database.endTransaction();
+                    }
+                }
+                database.close();
+                dataForDBs.clear();
+                Log.d(TAG,"end stat");
+                startActivity(intent);
+
+            }
+
+
 
         }
 
@@ -206,5 +221,75 @@ public class TableActivity extends Activity implements View.OnClickListener {
 
         }
     }
+
+    @Override
+    protected Dialog onCreateDialog (int id)
+    {
+
+        Log.d("logged","create");
+        AlertDialog.Builder adb = new AlertDialog.Builder(this);
+        adb.setTitle("Выбор времени");
+        ArrayAdapter<Integer> ad = new ArrayAdapter<Integer>(this,android.R.layout.simple_spinner_item,timeInt);
+        ad.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adb.setSingleChoiceItems(ad,-1,myOnClickListener);
+        adb.setPositiveButton("OK",myOnClickListener);
+        adb.setNegativeButton("CANCEL",myOnClickListener);
+
+
+
+        dialog = adb.create();
+        // todo : изменить размер диалога
+        return dialog;
+    }
+
+    DialogInterface.OnClickListener myOnClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+
+
+            if (which==Dialog.BUTTON_POSITIVE)
+            {
+                ListView lv = ((AlertDialog) dialog).getListView();
+                Button button = timeListButton.get(currentExercise);
+                String tmp="";
+                if (lv.getCheckedItemPosition()<10)
+                {
+                    tmp="0"+lv.getCheckedItemPosition();
+                }
+                else
+                {
+                    tmp=Integer.valueOf(lv.getCheckedItemPosition()).toString();
+                }
+                button.setText(tmp + ":00");
+                timeList.add(currentExercise,lv.getCheckedItemPosition());
+            }
+        }
+
+
+    };
+
+    private class DBHelper extends SQLiteOpenHelper
+    {
+        public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+            super(context, name, factory, version);
+        }
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+
+            db.execSQL("create table "+TABLE_NAME+" (id integer primary key autoincrement, "
+                    + "time integer, "
+                    + "date text, "
+                    + "points integer, "
+                    + "exercise text);");
+            Log.d(TAG,"created");
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        }
+    }
+
 
 }

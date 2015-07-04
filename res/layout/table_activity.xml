@@ -121,46 +121,10 @@
             android:layout_centerHorizontal="true"
             android:visibility="visible"
             />
-
-    <RelativeLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="100dp"
-            android:id="@+id/layoutWithTimePicker"
-            android:visibility="invisible">
-
-        <Spinner
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/spinnerMinutes"
-                android:layout_above="@+id/timePickerButton"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:prompt="@string/minutes" />
-
-        <Spinner
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/spinnerSeconds"
-                android:layout_alignTop="@+id/spinnerMinutes"
-                android:layout_toRightOf="@+id/timePickerButton"
-                android:layout_toEndOf="@+id/timePickerButton"
-                android:prompt="@string/seconds" />
-
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/okButton"
-                android:id="@+id/timePickerButton"
-                android:layout_gravity="center_horizontal"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginLeft="101dp"
-                android:layout_marginStart="101dp" />
-    </RelativeLayout>
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/statButton" android:layout_alignParentBottom="true" android:layout_alignParentEnd="true"
+            android:text="@string/statButton"/>
 
 </RelativeLayout>
