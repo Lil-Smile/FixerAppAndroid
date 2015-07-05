@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -59,6 +60,7 @@ public class TableActivity extends Activity implements View.OnClickListener {
     int currentExercise = 0; //счетчик упражнений
 
 
+    private CountDownTimer timer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -160,9 +162,12 @@ public class TableActivity extends Activity implements View.OnClickListener {
 
             case R.id.startButton:
             {
-                long time = minutesInt*60+secondsInt;
+                long time = timeList.get(currentExercise)*60;
                 //todo : реализовать нормальный таймер
-                //run(time);
+
+                showTimer(time*1000);
+                startButton.setEnabled(false);
+                plusButton.setEnabled(false);
                 break;
             }
 
@@ -201,26 +206,61 @@ public class TableActivity extends Activity implements View.OnClickListener {
 
     }
 
-    private void run(long time)
-    {
-        long timeStart = System.currentTimeMillis();
-        long tmp = 0;
-        Button bt = (Button)findViewById(R.id.timeButton1);
-        while (true)
+    private void showTimer(long countDownMillis) {
+        if(timer==null)
         {
-            tmp = System.currentTimeMillis();
-            tmp = tmp-timeStart;
+            Log.d(TAG,"showTimer"+countDownMillis);
+            timer = new CountDownTimer(countDownMillis,1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    long time = millisUntilFinished/1000;
+                    Log.d(TAG,Long.valueOf(time).toString());
+                    int m = (int)time/60;
+                    int s = (int)time%60;
+                    String str="";
+                    if (m<10)
+                    {
+                        str="0"+m;
+                    }
+                    else {
+                        str=Integer.valueOf(m).toString();
+                    }
+                    str=str+":";
+                    if (s<10)
+                    {
+                        str=str+"0"+s;
+                    }
+                    else
+                    {
+                        str=str+s;
+                    }
+                    final Button b = timeListButton.get(currentExercise);
+                    final String text = str;
+                    TableActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            b.setText(text);
+                        }
+                    });
+                }
 
-            time=time-tmp/1000;
-            bt.setText(time/60+":"+time%60);
-
-            if (time<+0)
-            {
-                break;
-            }
-
+                @Override
+                public void onFinish() {
+                    final Button b = timeListButton.get(currentExercise);
+                    TableActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            b.setText("00:00");
+                        }
+                    });
+                    startButton.setEnabled(true);
+                    plusButton.setEnabled(true);
+                }
+            }.start();
         }
     }
+
+
 
     @Override
     protected Dialog onCreateDialog (int id)
