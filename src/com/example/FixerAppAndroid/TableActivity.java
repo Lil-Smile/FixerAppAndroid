@@ -30,8 +30,8 @@ public class TableActivity extends Activity implements View.OnClickListener {
     final int DIALOG = 1;
     final String[] exercisesString = {"Рывок","Толчок","Д.цикл"};
     Integer[] timeInt = new Integer[60];
-    int minutesInt = 0;
-    int secondsInt = 0;
+    long timeOfCurrentExercise=0;
+    int globalSeconds=0;
 
     List<DataForDB> dataForDBs = new ArrayList<DataForDB>(10);
     List<Integer> timeList = new ArrayList<Integer>(10);
@@ -50,6 +50,7 @@ public class TableActivity extends Activity implements View.OnClickListener {
     Button button;
     Button startButton;
     Button statButton;
+    Button pauseButton;
 
     Dialog dialog;
 
@@ -74,6 +75,9 @@ public class TableActivity extends Activity implements View.OnClickListener {
 
         statButton = (Button)findViewById(R.id.statButton);
         statButton.setOnClickListener(this);
+
+        pauseButton = (Button)findViewById(R.id.pauseButton);
+        pauseButton.setOnClickListener(this);
 
         tl = (TableLayout)findViewById(R.id.currentStatLayout);
         tableRow = (TableRow)findViewById(R.id.createdTableRow);
@@ -118,37 +122,40 @@ public class TableActivity extends Activity implements View.OnClickListener {
         {
             case R.id.plusButton:
             {
-                TextView exTextView = new TextView(this);
-                exTextView.setLayoutParams(textView.getLayoutParams());
-                exTextView.setTextSize(30);
-                TextView poTextView = new TextView(this);
-                poTextView.setLayoutParams(textView1.getLayoutParams());
-                poTextView.setTextSize(30);
-                Button tButton = new Button(this);
-                tButton.setLayoutParams(button.getLayoutParams());
-                tButton.setTextSize(30);
-                tButton.setId(R.id.timeButton1);
-                tButton.setOnClickListener(this);
-                exTextView.setText(exercisesString[exercisesSpinner.getSelectedItemPosition()]);
-                poTextView.setText("0");
-                tButton.setText("00:00");
-                timeListButton.get(currentExercise).setEnabled(false); //black fucking magic
-                timeListButton.get(currentExercise).setId(0);
-                //adding previous to array
-                DataForDB dataForDB = new DataForDB(timeList.get(currentExercise).intValue(),Integer.valueOf(pointListTextView.get(currentExercise).getText().toString()).intValue(),exerciseListTextView.get(currentExercise).getText().toString());
-                dataForDBs.add(dataForDB);
-                currentExercise++;
-                exerciseListTextView.add(currentExercise,exTextView);
-                pointListTextView.add(currentExercise,poTextView);
-                timeListButton.add(currentExercise,tButton);
-                TableRow tr = new TableRow(this);
-                tr.addView(exTextView);
-                tr.addView(poTextView);
-                tr.addView(tButton);
-                tr.setLayoutParams(tableRow.getLayoutParams());
-                tl.addView(tr);
+                if (timeList.size()>currentExercise)
+                {
+                    TextView exTextView = new TextView(this);
+                    exTextView.setLayoutParams(textView.getLayoutParams());
+                    exTextView.setTextSize(30);
+                    TextView poTextView = new TextView(this);
+                    poTextView.setLayoutParams(textView1.getLayoutParams());
+                    poTextView.setTextSize(30);
+                    Button tButton = new Button(this);
+                    tButton.setLayoutParams(button.getLayoutParams());
+                    tButton.setTextSize(30);
+                    tButton.setId(R.id.timeButton1);
+                    tButton.setOnClickListener(this);
+                    exTextView.setText(exercisesString[exercisesSpinner.getSelectedItemPosition()]);
+                    poTextView.setText("0");
+                    tButton.setText("00:00");
+                    timeListButton.get(currentExercise).setEnabled(false); //black fucking magic
+                    timeListButton.get(currentExercise).setId(0);
+                    //adding previous to array
+                    DataForDB dataForDB = new DataForDB(timeList.get(currentExercise).intValue(), Integer.valueOf(pointListTextView.get(currentExercise).getText().toString()).intValue(), exerciseListTextView.get(currentExercise).getText().toString());
+                    dataForDBs.add(dataForDB);
+                    currentExercise++;
+                    exerciseListTextView.add(currentExercise, exTextView);
+                    pointListTextView.add(currentExercise, poTextView);
+                    timeListButton.add(currentExercise, tButton);
+                    TableRow tr = new TableRow(this);
+                    tr.addView(exTextView);
+                    tr.addView(poTextView);
+                    tr.addView(tButton);
+                    tr.setLayoutParams(tableRow.getLayoutParams());
+                    tl.addView(tr);
+                    globalSeconds=0;
 
-
+                }
                 break;
             }
             case R.id.timeButton1:
@@ -162,12 +169,18 @@ public class TableActivity extends Activity implements View.OnClickListener {
 
             case R.id.startButton:
             {
-                long time = timeList.get(currentExercise)*60;
-                //todo : реализовать нормальный таймер
-
-                showTimer(time*1000);
-                startButton.setEnabled(false);
-                plusButton.setEnabled(false);
+                if (timeList.size()>0)
+                {
+                    long time = timeList.get(currentExercise)*60;
+                    if (globalSeconds!=0)
+                    {
+                        time-=globalSeconds;
+                    }
+                    showTimer(time*1000);
+                    startButton.setEnabled(false);
+                    plusButton.setEnabled(false);
+                    run();
+                }
                 break;
             }
 
@@ -199,6 +212,18 @@ public class TableActivity extends Activity implements View.OnClickListener {
                 startActivity(intent);
 
             }
+            case R.id.pauseButton:
+            {
+                if (timer!=null)
+                {
+                    timer.cancel();
+                    timer=null;
+                    timeList.add(currentExercise,(int)timeOfCurrentExercise);
+                    startButton.setEnabled(true);
+                    plusButton.setEnabled(true);
+                }
+                break;
+            }
 
 
 
@@ -206,14 +231,29 @@ public class TableActivity extends Activity implements View.OnClickListener {
 
     }
 
+    private void run() {
+        //todo : getting data from device
+    }
+
     private void showTimer(long countDownMillis) {
         if(timer==null)
         {
+
             Log.d(TAG,"showTimer"+countDownMillis);
             timer = new CountDownTimer(countDownMillis,1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     long time = millisUntilFinished/1000;
+
+                    if (time%60==0)
+                    {
+                        timeOfCurrentExercise=time/60;
+                    } else
+                    {
+                        timeOfCurrentExercise=(time/60)+1;
+
+                    }
+                    globalSeconds=60-(int)time%60;
                     Log.d(TAG,Long.valueOf(time).toString());
                     int m = (int)time/60;
                     int s = (int)time%60;
@@ -278,7 +318,7 @@ public class TableActivity extends Activity implements View.OnClickListener {
 
 
         dialog = adb.create();
-        // todo : изменить размер диалога
+
         return dialog;
     }
 

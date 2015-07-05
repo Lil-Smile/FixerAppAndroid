@@ -126,5 +126,11 @@
             android:layout_height="wrap_content"
             android:id="@+id/statButton" android:layout_alignParentBottom="true" android:layout_alignParentEnd="true"
             android:text="@string/statButton"/>
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pause"
+            android:id="@+id/pauseButton"
+            android:layout_alignTop="@+id/plusButton" android:layout_alignParentStart="true"/>
 
 </RelativeLayout>
