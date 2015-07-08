@@ -20,28 +20,28 @@
                         android:text="@string/mainTime"
                         android:id="@+id/mainTime"
                         android:layout_weight="1"
-                        android:textSize="@dimen/fontsStatSize"/>
+                        android:textSize="@dimen/fontsStatSize" android:textAlignment="center"/>
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/mainDate"
                         android:id="@+id/mainDate"
                         android:layout_weight="1"
-                        android:textSize="@dimen/fontsStatSize"/>
+                        android:textSize="@dimen/fontsStatSize" android:textAlignment="center"/>
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/mainExercise"
                         android:id="@+id/mainExercise"
                         android:layout_weight="1"
-                        android:textSize="@dimen/fontsStatSize"/>
+                        android:textSize="@dimen/fontsStatSize" android:textAlignment="center"/>
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/mainCount"
                         android:id="@+id/mainCount"
                         android:layout_weight="1"
-                        android:textSize="@dimen/fontsStatSize"/>
+                        android:textSize="@dimen/fontsStatSize" android:textAlignment="center"/>
             </TableRow>
         </TableLayout>
     </ScrollView>

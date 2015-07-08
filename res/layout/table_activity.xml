@@ -107,30 +107,26 @@
             android:layout_height="wrap_content"
             android:text="@string/plusButton"
             android:id="@+id/plusButton"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="70dp"
-            />
+            android:layout_above="@+id/statButton" android:layout_alignEnd="@+id/scrollView"/>
 
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/startButton"
             android:id="@+id/startButton"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
             android:visibility="visible"
-            />
+            android:layout_above="@+id/statButton" android:layout_centerHorizontal="true"/>
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/statButton" android:layout_alignParentBottom="true" android:layout_alignParentEnd="true"
-            android:text="@string/statButton"/>
+            android:id="@+id/statButton"
+            android:text="@string/statButton" android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pause"
             android:id="@+id/pauseButton"
-            android:layout_alignTop="@+id/plusButton" android:layout_alignParentStart="true"/>
+            android:layout_above="@+id/statButton" android:layout_alignParentStart="true"/>
 
 </RelativeLayout>
