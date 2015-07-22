@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -52,7 +53,9 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             passwordEditText.setVisibility(View.INVISIBLE);
             goButton.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
-            onContinueButtonClick(goButton);
+            //onContinueButtonClick(goButton);
+            MyAsyncTask myAsyncTask = new MyAsyncTask();
+            myAsyncTask.execute();
         }
     }
 
@@ -88,6 +91,30 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     passwordEditText.setText("");
                 }
             }
+        }
+    }
+
+    private class MyAsyncTask extends AsyncTask<Void,Void,Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            for (int i = 0; i<5; i++)
+            {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result)
+        {
+            onContinueButtonClick(goButton);
+            return;
         }
     }
 }
